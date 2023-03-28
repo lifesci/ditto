@@ -1,0 +1,92 @@
+use std::str::FromStr;
+use crate::ast::*;
+
+grammar;
+
+// START TOKENS
+
+// Arithmetic
+t_Add: &'input str = "+";
+t_Sub: &'input str = "-";
+t_Mul: &'input str = "*";
+t_Div: &'input str = "/";
+t_Mod: &'input str = "%";
+
+// Logic
+t_And: &'input str = "and";
+t_Or: &'input str = "or";
+t_Not: &'input str = "not";
+t_Equal: &'input str = "==";
+t_Gt: &'input str = ">";
+t_Lt: &'input str = "<";
+t_Gte: &'input str = ">=";
+t_Lte: &'input str = "<=";
+
+// Numeric literals
+t_Int: i32 = r"0|[1-9][0-9]*" => i32::from_str(<>).unwrap();
+t_Float: f32 = r"(?:0|[1-9][0-9]*)\.[0-9]+" => f32::from_str(<>).unwrap();
+
+// Boolean literals
+t_True: bool = "true" => true;
+t_False: bool = "false" => false;
+
+// String literals
+t_Str: String = r#""[^"]*""# => <>.to_string();
+
+// Identifiers
+t_Id: String = r"[a-zA-Z][a-zA-Z0-9_]*" => <>.to_string();
+
+// Keywords
+t_Let: &'input str = "let";
+t_If: &'input str = "if";
+t_While: &'input str = "if";
+
+// END TOKENS
+
+// START GRAMMAR
+
+pub Game: GameNode = {
+    "game" <name: t_Id> => GameNode {name: name}
+};
+
+Property: PropertyNode = {
+    <var:t_Id> "." <prop:t_Id> => PropertyNode {var: var, prop: prop}
+};
+
+Expr: Box<ExprEnum> = {
+    <l:Expr> t_Add <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Add, l: l, r: r})),
+    <l:Expr> t_Sub <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Sub, l: l, r: r})),
+    <l:Expr> t_Or <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Or, l: l, r: r})),
+    <l:Expr> t_Equal <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Equal, l: l, r: r})),
+    <l:Expr> t_Gt <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gt, l: l, r: r})),
+    <l:Expr> t_Lt <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lt, l: l, r: r})),
+    <l:Expr> t_Gte <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gte, l: l, r: r})),
+    <l:Expr> t_Lte <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lte, l: l, r: r})),
+    Factor,
+}
+
+Factor: Box<ExprEnum> = {
+    <l:Factor> t_Mul <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mul, l: l, r: r})),
+    <l:Factor> t_Div <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Div, l: l, r: r})),
+    <l:Factor> t_Mod <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mod, l: l, r: r})),
+    <l:Factor> t_And <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::And, l: l, r: r})),
+    <Unary>,
+}
+
+Unary: Box<ExprEnum> = {
+    t_Sub <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Neg, l: l})),
+    t_Not <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Not, l: l})),
+}
+
+Term: Box<ExprEnum> = {
+    "(" <Expr> ")",
+    t_Int => Box::new(ExprEnum::Int(<>)),
+    t_Float => Box::new(ExprEnum::Float(<>)),
+    t_True => Box::new(ExprEnum::Bool(<>)),
+    t_False => Box::new(ExprEnum::Bool(<>)),
+    t_Str => Box::new(ExprEnum::Str(<>)),
+    t_Id => Box::new(ExprEnum::Var(<>)),
+    Property => Box::new(ExprEnum::Prop(<>)),
+}
+
+// END GRAMMAR
