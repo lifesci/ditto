@@ -8,6 +8,44 @@ pub struct PropertyNode {
     pub prop: String,
 }
 
+pub struct WhileNode {
+    pub cond: Box<ExprEnum>,
+    pub children: Vec<Box<StmtEnum>>,
+}
+
+pub struct AssignNode {
+    pub l: Box<AssignEnum>,
+    pub r: Box<ExprEnum>,
+}
+
+pub struct DeclareNode {
+    pub l: String,
+    pub r: Box<ExprEnum>,
+}
+
+pub struct IfNode {
+    pub cond: Box<ExprEnum>,
+    pub children: Vec<Box<StmtEnum>>,
+}
+
+pub struct CondNode {
+    pub main: IfNode,
+    pub alt: Vec<IfNode>,
+    pub fin: Vec<Box<StmtEnum>>,
+}
+
+pub enum AssignEnum {
+    Var(String),
+    Prop(PropertyNode),
+}
+
+pub enum StmtEnum {
+    While(WhileNode),
+    Assign(AssignNode),
+    Declare(DeclareNode),
+    Cond(CondNode),
+}
+
 pub struct BinOpNode {
     pub op: BinOp,
     pub l: Box<ExprEnum>,

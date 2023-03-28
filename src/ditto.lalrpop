@@ -39,7 +39,8 @@ t_Id: String = r"[a-zA-Z][a-zA-Z0-9_]*" => <>.to_string();
 // Keywords
 t_Let: &'input str = "let";
 t_If: &'input str = "if";
-t_While: &'input str = "if";
+t_Else: &'input str = "else";
+t_While: &'input str = "while";
 
 // END TOKENS
 
@@ -49,33 +50,56 @@ pub Game: GameNode = {
     "game" <name: t_Id> => GameNode {name: name}
 };
 
+Stmt: Box<StmtEnum> = {
+    t_Let <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::Declare(DeclareNode {<>})),
+    <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::Assign(AssignNode {l: Box::new(AssignEnum::Var(l)), r: r})),
+    <l: Property> "=" <r: Expr> ";" => Box::new(StmtEnum::Assign(AssignNode {l: Box::new(AssignEnum::Prop(l)), r: r})),
+    t_While "(" <cond: Expr> ")" "{" <children: StmtList> "}" => Box::new(StmtEnum::While(WhileNode {<>})),
+    <main: If> <alt: (t_Else <If>)*> <fin: Else> => Box::new(StmtEnum::Cond(CondNode {<>})),
+}
+
+StmtList: Vec<Box<StmtEnum>> = {
+    Stmt*,
+}
+
+If: IfNode = {
+    t_If "(" <cond: Expr> ")" "{" <children: Stmt*> "}" => IfNode {<>},
+}
+
+Else: Vec<Box<StmtEnum>> = {
+    <branch: (t_Else <StmtList>)?> => match branch {
+        None => Vec::new(),
+        Some(b) => b,
+    }
+};
+
 Property: PropertyNode = {
     <var:t_Id> "." <prop:t_Id> => PropertyNode {var: var, prop: prop}
 };
 
 Expr: Box<ExprEnum> = {
-    <l:Expr> t_Add <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Add, l: l, r: r})),
-    <l:Expr> t_Sub <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Sub, l: l, r: r})),
-    <l:Expr> t_Or <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Or, l: l, r: r})),
-    <l:Expr> t_Equal <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Equal, l: l, r: r})),
-    <l:Expr> t_Gt <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gt, l: l, r: r})),
-    <l:Expr> t_Lt <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lt, l: l, r: r})),
-    <l:Expr> t_Gte <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gte, l: l, r: r})),
-    <l:Expr> t_Lte <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lte, l: l, r: r})),
+    <l:Expr> t_Add <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Add, <>})),
+    <l:Expr> t_Sub <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Sub, <>})),
+    <l:Expr> t_Or <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Or, <>})),
+    <l:Expr> t_Equal <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Equal, <>})),
+    <l:Expr> t_Gt <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gt, <>})),
+    <l:Expr> t_Lt <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lt, <>})),
+    <l:Expr> t_Gte <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gte, <>})),
+    <l:Expr> t_Lte <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lte, <>})),
     Factor,
 }
 
 Factor: Box<ExprEnum> = {
-    <l:Factor> t_Mul <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mul, l: l, r: r})),
-    <l:Factor> t_Div <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Div, l: l, r: r})),
-    <l:Factor> t_Mod <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mod, l: l, r: r})),
-    <l:Factor> t_And <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::And, l: l, r: r})),
+    <l:Factor> t_Mul <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mul, <>})),
+    <l:Factor> t_Div <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Div, <>})),
+    <l:Factor> t_Mod <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mod, <>})),
+    <l:Factor> t_And <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::And, <>})),
     <Unary>,
 }
 
 Unary: Box<ExprEnum> = {
-    t_Sub <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Neg, l: l})),
-    t_Not <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Not, l: l})),
+    t_Sub <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Neg, <>})),
+    t_Not <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Not, <>})),
 }
 
 Term: Box<ExprEnum> = {
