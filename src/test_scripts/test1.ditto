@@ -2,4 +2,6 @@ game test;
 
 player me {
     hp = 1;
+    str_test = "test";
+    float_test = 0.001;
 }
