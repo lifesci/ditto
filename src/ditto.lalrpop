@@ -41,14 +41,41 @@ t_Let: &'input str = "let";
 t_If: &'input str = "if";
 t_Else: &'input str = "else";
 t_While: &'input str = "while";
+t_Player: &'input str = "player";
+t_Action: &'input str = "action";
+t_Targets: &'input str = "targets";
+t_Trigger: &'input str = "trigger";
+t_On: &'input str = "on";
 
 // END TOKENS
 
 // START GRAMMAR
 
-pub Game: GameNode = {
-    "game" <name: t_Id> => GameNode {name: name}
+pub Ditto: DittoNode = {
+    <game: Game>
+    <player: Player>
+    => DittoNode {<>},
+}
+
+Game: GameNode = {
+    "game" <name: t_Id> ";" => GameNode {name: name}
 };
+
+Player: PlayerNode = {
+    t_Player <name: t_Id> "{" <stats: Stat*> <actions: Action*> <triggers: Trigger*> "}" => PlayerNode {<>}
+}
+
+Stat: StatNode = {
+    <name: t_Id> "=" <val: Expr> ";" => StatNode {<>},
+}
+
+Action: ActionNode = {
+    t_Action <name: t_Id> t_Targets "(" <targets: t_Id+> ")" "{" <children: StmtList> "}" => ActionNode {<>},
+}
+
+Trigger: TriggerNode = {
+    t_Trigger <name: t_Id> t_On "(" <actions: t_Id+> ")" "{" <children: StmtList> "}" => TriggerNode {<>},
+}
 
 Stmt: Box<StmtEnum> = {
     t_Let <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::Declare(DeclareNode {<>})),
@@ -67,7 +94,7 @@ If: IfNode = {
 }
 
 Else: Vec<Box<StmtEnum>> = {
-    <branch: (t_Else <StmtList>)?> => match branch {
+    <branch: (t_Else "{" <StmtList> "}")?> => match branch {
         None => Vec::new(),
         Some(b) => b,
     }
@@ -78,28 +105,29 @@ Property: PropertyNode = {
 };
 
 Expr: Box<ExprEnum> = {
-    <l:Expr> t_Add <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Add, <>})),
-    <l:Expr> t_Sub <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Sub, <>})),
-    <l:Expr> t_Or <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Or, <>})),
-    <l:Expr> t_Equal <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Equal, <>})),
-    <l:Expr> t_Gt <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gt, <>})),
-    <l:Expr> t_Lt <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lt, <>})),
-    <l:Expr> t_Gte <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gte, <>})),
-    <l:Expr> t_Lte <r:Expr> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lte, <>})),
+    <l:Expr> t_Add <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Add, <>})),
+    <l:Expr> t_Sub <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Sub, <>})),
+    <l:Expr> t_Or <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Or, <>})),
+    <l:Expr> t_Equal <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Equal, <>})),
+    <l:Expr> t_Gt <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gt, <>})),
+    <l:Expr> t_Lt <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lt, <>})),
+    <l:Expr> t_Gte <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Gte, <>})),
+    <l:Expr> t_Lte <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Lte, <>})),
     Factor,
 }
 
 Factor: Box<ExprEnum> = {
-    <l:Factor> t_Mul <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mul, <>})),
-    <l:Factor> t_Div <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Div, <>})),
-    <l:Factor> t_Mod <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mod, <>})),
-    <l:Factor> t_And <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::And, <>})),
+    <l:Factor> t_Mul <r:Unary> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mul, <>})),
+    <l:Factor> t_Div <r:Unary> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Div, <>})),
+    <l:Factor> t_Mod <r:Unary> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mod, <>})),
+    <l:Factor> t_And <r:Unary> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::And, <>})),
     <Unary>,
 }
 
 Unary: Box<ExprEnum> = {
     t_Sub <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Neg, <>})),
     t_Not <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Not, <>})),
+    Term,
 }
 
 Term: Box<ExprEnum> = {

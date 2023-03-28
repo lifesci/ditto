@@ -1,0 +1,5 @@
+game test;
+
+player me {
+    hp = 1;
+}
