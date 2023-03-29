@@ -1,7 +1,8 @@
 #[derive(Debug)]
 pub struct DittoNode {
     pub game: GameNode,
-    pub player: PlayerNode,
+    pub player: EntityNode,
+    pub enemies: Vec<EntityNode>,
 }
 
 #[derive(Debug)]
@@ -10,12 +11,16 @@ pub struct GameNode {
 }
 
 #[derive(Debug)]
-pub struct PlayerNode {
+pub struct EntityNode {
+    pub entity: EntityType,
     pub name: String,
     pub stats: Vec<StatNode>,
     pub actions: Vec<ActionNode>,
     pub triggers: Vec<TriggerNode>,
 }
+
+#[derive(Debug)]
+pub enum EntityType { Player, Enemy }
 
 #[derive(Debug)]
 pub struct StatNode {

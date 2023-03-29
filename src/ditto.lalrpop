@@ -42,6 +42,7 @@ t_If: &'input str = "if";
 t_Else: &'input str = "else";
 t_While: &'input str = "while";
 t_Player: &'input str = "player";
+t_Enemy: &'input str = "enemy";
 t_Action: &'input str = "action";
 t_Targets: &'input str = "targets";
 t_Trigger: &'input str = "trigger";
@@ -54,6 +55,7 @@ t_On: &'input str = "on";
 pub Ditto: DittoNode = {
     <game: Game>
     <player: Player>
+    <enemies: Enemy*>
     => DittoNode {<>},
 }
 
@@ -61,8 +63,12 @@ Game: GameNode = {
     "game" <name: t_Id> ";" => GameNode {name: name}
 };
 
-Player: PlayerNode = {
-    t_Player <name: t_Id> "{" <stats: Stat*> <actions: Action*> <triggers: Trigger*> "}" => PlayerNode {<>}
+Player: EntityNode = {
+    t_Player <name: t_Id> "{" <stats: Stat*> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Player, <>}
+}
+
+Enemy: EntityNode = {
+    t_Enemy <name: t_Id> "{" <stats: Stat*> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Enemy, <>}
 }
 
 Stat: StatNode = {
