@@ -4,6 +4,8 @@ pub struct DittoNode {
     pub statblock: StatblockNode,
     pub player: EntityNode,
     pub enemies: Vec<EntityNode>,
+    pub items: Vec<ItemTemplateNode>,
+    pub rooms: Vec<RoomNode>,
 }
 
 #[derive(Debug)]
@@ -32,6 +34,35 @@ pub enum EntityType { Player, Enemy }
 pub struct StatNode {
     pub name: String,
     pub val: Box<ExprEnum>,
+}
+
+#[derive(Debug)]
+pub struct ItemTemplateNode {
+    pub name: String,
+    pub attribs: Vec<String>,
+    pub args: Vec<String>,
+    pub actions: Vec<ActionNode>,
+}
+
+#[derive(Debug)]
+pub struct ItemInstanceNode {
+    pub name: String,
+    pub attribs: Vec<String>,
+    pub args: Vec<Box<ExprEnum>>,
+}
+
+#[derive(Debug)]
+pub struct DoorNode {
+    pub name: String,
+    pub to: String,
+    pub reqs: Vec<String>,
+}
+
+#[derive(Debug)]
+pub struct RoomNode {
+    pub name: String,
+    pub items: Vec<ItemInstanceNode>,
+    pub doors: Vec<DoorNode>,
 }
 
 #[derive(Debug)]

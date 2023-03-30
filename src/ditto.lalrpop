@@ -49,16 +49,33 @@ t_Trigger: &'input str = "trigger";
 t_On: &'input str = "on";
 t_Statblock: &'input str = "statblock";
 t_Stats: &'input str = "stats";
+t_Item: &'input str = "item";
+t_Door: &'input str = "door";
+t_To: &'input str = "to";
+t_Requires: &'input str = "requires";
+t_Room: &'input str = "room";
 
 // END TOKENS
 
 // START GRAMMAR
+
+CommaList<T>: Vec<T> = {
+    <mut list: (<T> ",") *> <last: T?> => match last {
+        Some(l) => {
+            list.push(l);
+            list
+        },
+        None => list,
+    },
+}
 
 pub Ditto: DittoNode = {
     <game: Game>
     <statblock: Statblock>
     <player: Player>
     <enemies: Enemy*>
+    <items: ItemTemplate*>
+    <rooms: Room*>
     => DittoNode {<>},
 }
 
@@ -93,6 +110,38 @@ Enemy: EntityNode = {
     t_Enemy <name: t_Id> "{" <stats: Stat*> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Enemy, <>},
 }
 
+ItemTemplate: ItemTemplateNode = {
+    t_Item <name: t_Id> "<" <attribs: CommaList<t_Id>> ">" "(" <args: CommaList<t_Id>> ")" "{" <actions: Action*> "}" => ItemTemplateNode {<>},
+}
+
+ItemInstance: ItemInstanceNode = {
+    <name: t_Id> <attribs: ItemInstanceAttribList> "(" <args: CommaList<Expr>> ")" ";" => ItemInstanceNode {<>},
+}
+
+ItemInstanceAttribList: Vec<String> = {
+    <attribs: ("<" <CommaList<t_Id>> ">")?> => match attribs {
+        Some(a) => a,
+        None => Vec::new(),
+    },
+}
+
+Door: DoorNode = {
+    t_Door <name: t_Id> t_To <to:t_Id> <reqs: DoorReqs> ";" => DoorNode {<>},
+}
+
+DoorReqs: Vec<String> = {
+    <reqs: (t_Requires "(" <CommaList<t_Id>> ")")?> => match reqs {
+        Some(r) => r,
+        None => Vec::new(),
+    },
+}
+
+Room: RoomNode = {
+    t_Room <name: t_Id> "{" <items: ItemInstance*> <doors: Door*> "}" => RoomNode {<>},
+}
+
+IdList = { t_Id* }
+
 Action: ActionNode = {
     t_Action <name: t_Id> t_Targets "(" <targets: Expr> ")" "{" <children: StmtList> "}" => ActionNode {<>},
 }
@@ -125,7 +174,7 @@ Else: Vec<Box<StmtEnum>> = {
 };
 
 Property: PropertyNode = {
-    <var:t_Id> "." <prop:t_Id> => PropertyNode {var: var, prop: prop}
+    <var:t_Id> "." <prop:t_Id> => PropertyNode {var: var, prop: prop},
 };
 
 Expr: Box<ExprEnum> = {

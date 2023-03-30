@@ -1,6 +1,8 @@
 game test;
 
-statblock {}
+statblock {
+    hp = 1;
+}
 
 player me {
     stats {
@@ -10,4 +12,25 @@ player me {
     }
     action test_action targets (a or b) {}
     trigger test_trigger on (c or not d) {}
+}
+
+enemy test_enemy {
+    action test_action targets (a or b) {}
+    trigger test_trigger on (c or not d) {}
+}
+
+item test_item<weapon>(dmg) {
+    action attack targets (entity) {
+        target.hp = target.hp - dmg;
+    }
+}
+
+room test_room1 {
+    test_item(5);
+    door door1 to test_room2;
+}
+
+room test_room2 {
+    test_item(5);
+    door door2 to test_room1 requires(key);
 }
