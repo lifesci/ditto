@@ -94,11 +94,11 @@ Enemy: EntityNode = {
 }
 
 Action: ActionNode = {
-    t_Action <name: t_Id> t_Targets "(" <targets: t_Id+> ")" "{" <children: StmtList> "}" => ActionNode {<>},
+    t_Action <name: t_Id> t_Targets "(" <targets: Expr> ")" "{" <children: StmtList> "}" => ActionNode {<>},
 }
 
 Trigger: TriggerNode = {
-    t_Trigger <name: t_Id> t_On "(" <actions: t_Id+> ")" "{" <children: StmtList> "}" => TriggerNode {<>},
+    t_Trigger <name: t_Id> t_On "(" <actions: Expr> ")" "{" <children: StmtList> "}" => TriggerNode {<>},
 }
 
 Stmt: Box<StmtEnum> = {

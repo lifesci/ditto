@@ -37,14 +37,14 @@ pub struct StatNode {
 #[derive(Debug)]
 pub struct ActionNode {
     pub name: String,
-    pub targets: Vec<String>,
+    pub targets: Box<ExprEnum>,
     pub children: Vec<Box<StmtEnum>>,
 }
 
 #[derive(Debug)]
 pub struct TriggerNode {
     pub name: String,
-    pub actions: Vec<String>,
+    pub actions: Box<ExprEnum>,
     pub children: Vec<Box<StmtEnum>>,
 }
 
