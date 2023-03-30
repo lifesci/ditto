@@ -47,6 +47,8 @@ t_Action: &'input str = "action";
 t_Targets: &'input str = "targets";
 t_Trigger: &'input str = "trigger";
 t_On: &'input str = "on";
+t_Statblock: &'input str = "statblock";
+t_Stats: &'input str = "stats";
 
 // END TOKENS
 
@@ -54,25 +56,41 @@ t_On: &'input str = "on";
 
 pub Ditto: DittoNode = {
     <game: Game>
+    <statblock: Statblock>
     <player: Player>
     <enemies: Enemy*>
     => DittoNode {<>},
 }
 
 Game: GameNode = {
-    "game" <name: t_Id> ";" => GameNode {name: name}
-};
-
-Player: EntityNode = {
-    t_Player <name: t_Id> "{" <stats: Stat*> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Player, <>}
+    "game" <name: t_Id> ";" => GameNode {name: name},
 }
 
-Enemy: EntityNode = {
-    t_Enemy <name: t_Id> "{" <stats: Stat*> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Enemy, <>}
+Statblock: StatblockNode = {
+    t_Statblock "{" <stats: StatList> "}" => StatblockNode {<>},
+}
+
+StatOverride: Vec<StatNode> = {
+    <stats: (t_Stats "{" <StatList> "}")?> => match stats {
+        Some(s) => s,
+        None => Vec::new(),
+    },
+}
+
+StatList: Vec<StatNode> = {
+    <Stat*>,
 }
 
 Stat: StatNode = {
     <name: t_Id> "=" <val: Expr> ";" => StatNode {<>},
+}
+
+Player: EntityNode = {
+    t_Player <name: t_Id> "{" <stats: StatOverride> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Player, <>},
+}
+
+Enemy: EntityNode = {
+    t_Enemy <name: t_Id> "{" <stats: Stat*> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Enemy, <>},
 }
 
 Action: ActionNode = {

@@ -1,13 +1,19 @@
 #[derive(Debug)]
 pub struct DittoNode {
     pub game: GameNode,
+    pub statblock: StatblockNode,
     pub player: EntityNode,
     pub enemies: Vec<EntityNode>,
 }
 
 #[derive(Debug)]
 pub struct GameNode {
-    pub name: String
+    pub name: String,
+}
+
+#[derive(Debug)]
+pub struct StatblockNode {
+    pub stats: Vec<StatNode>,
 }
 
 #[derive(Debug)]
