@@ -15,6 +15,11 @@ player me {
 }
 
 enemy test_enemy {
+    stats {
+        hp = 1;
+        str_test = "test";
+        float_test = 0.001;
+    }
     action test_action targets (a or b) {}
     trigger test_trigger on (c or not d) {}
 }

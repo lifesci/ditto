@@ -107,7 +107,7 @@ Player: EntityNode = {
 }
 
 Enemy: EntityNode = {
-    t_Enemy <name: t_Id> "{" <stats: Stat*> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Enemy, <>},
+    t_Enemy <name: t_Id> "{" <stats: StatOverride> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Enemy, <>},
 }
 
 ItemTemplate: ItemTemplateNode = {
