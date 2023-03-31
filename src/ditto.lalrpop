@@ -109,7 +109,7 @@ ItemTemplate: ItemTemplateNode = {
 }
 
 ItemInstance: ItemInstanceNode = {
-    <name: t_Id> <attribs: ItemInstanceAttribList> "(" <args: CommaList<Expr>> ")" ";" => ItemInstanceNode {<>},
+    <name: t_Id> "=" <template: t_Id> <attribs: ItemInstanceAttribList> "(" <args: CommaList<Expr>> ")" ";" => ItemInstanceNode {<>},
 }
 
 ItemInstanceAttribList: Vec<String> = {
@@ -139,8 +139,8 @@ Room: RoomNode = {
     => RoomNode {<>},
 }
 
-EnemyInstance: String = {
-    <t_Id> ";",
+EnemyInstance: EnemyInstanceNode = {
+    <name: t_Id> "=" <enemy: t_Id> ";" => EnemyInstanceNode {<>},
 }
 
 Action: ActionNode = {

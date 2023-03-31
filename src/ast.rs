@@ -47,6 +47,7 @@ pub struct ItemTemplateNode {
 #[derive(Debug)]
 pub struct ItemInstanceNode {
     pub name: String,
+    pub template: String,
     pub attribs: Vec<String>,
     pub args: Vec<Box<ExprEnum>>,
 }
@@ -59,9 +60,15 @@ pub struct DoorNode {
 }
 
 #[derive(Debug)]
+pub struct EnemyInstanceNode {
+    pub name: String,
+    pub enemy: String,
+}
+
+#[derive(Debug)]
 pub struct RoomNode {
     pub name: String,
-    pub enemies: Vec<String>,
+    pub enemies: Vec<EnemyInstanceNode>,
     pub items: Vec<ItemInstanceNode>,
     pub doors: Vec<DoorNode>,
 }
