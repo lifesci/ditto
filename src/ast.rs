@@ -148,9 +148,6 @@ pub enum ExprEnum {
     BinOp(BinOpNode),
     UnaryOp(UnaryOpNode),
     Int(i32),
-    Float(f32),
-    Bool(bool),
-    Str(String),
     Var(String),
     Prop(PropertyNode),
 }
