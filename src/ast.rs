@@ -61,6 +61,7 @@ pub struct DoorNode {
 #[derive(Debug)]
 pub struct RoomNode {
     pub name: String,
+    pub enemies: Vec<String>,
     pub items: Vec<ItemInstanceNode>,
     pub doors: Vec<DoorNode>,
 }

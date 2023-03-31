@@ -28,11 +28,26 @@ item test_item<weapon>(dmg) {
 }
 
 room test_room1 {
-    test_item(5);
-    door door1 to test_room2;
+    enemies {}
+    items {
+        test_item(3);
+    }
+    doors {
+        door1 to test_room2;
+    }
 }
 
 room test_room2 {
-    test_item(5);
-    door door2 to test_room1 requires(key);
+    enemies {
+        test_enemy;
+        test_enemy2;
+    }
+    items {
+        test_item(5);
+        test_item(6);
+    }
+    doors {
+        door2 to test_room1 requires(key);
+        red_door to test_room2 requires(red_key);
+    }
 }

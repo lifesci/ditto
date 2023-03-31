@@ -35,6 +35,7 @@ t_Else: &'input str = "else";
 t_While: &'input str = "while";
 t_Player: &'input str = "player";
 t_Enemy: &'input str = "enemy";
+t_Enemies: &'input str = "enemies";
 t_Action: &'input str = "action";
 t_Targets: &'input str = "targets";
 t_Trigger: &'input str = "trigger";
@@ -42,7 +43,8 @@ t_On: &'input str = "on";
 t_Statblock: &'input str = "statblock";
 t_Stats: &'input str = "stats";
 t_Item: &'input str = "item";
-t_Door: &'input str = "door";
+t_Items: &'input str = "items";
+t_Doors: &'input str = "doors";
 t_To: &'input str = "to";
 t_Requires: &'input str = "requires";
 t_Room: &'input str = "room";
@@ -118,7 +120,7 @@ ItemInstanceAttribList: Vec<String> = {
 }
 
 Door: DoorNode = {
-    t_Door <name: t_Id> t_To <to:t_Id> <reqs: DoorReqs> ";" => DoorNode {<>},
+    <name: t_Id> t_To <to:t_Id> <reqs: DoorReqs> ";" => DoorNode {<>},
 }
 
 DoorReqs: Vec<String> = {
@@ -129,10 +131,17 @@ DoorReqs: Vec<String> = {
 }
 
 Room: RoomNode = {
-    t_Room <name: t_Id> "{" <items: ItemInstance*> <doors: Door*> "}" => RoomNode {<>},
+    t_Room <name: t_Id> "{"
+        t_Enemies "{" <enemies: EnemyInstance*> "}"
+        t_Items  "{" <items: ItemInstance*> "}"
+        t_Doors "{" <doors: Door*> "}"
+    "}"
+    => RoomNode {<>},
 }
 
-IdList = { t_Id* }
+EnemyInstance: String = {
+    <t_Id> ";",
+}
 
 Action: ActionNode = {
     t_Action <name: t_Id> t_Targets "(" <targets: Expr> ")" "{" <children: StmtList> "}" => ActionNode {<>},
