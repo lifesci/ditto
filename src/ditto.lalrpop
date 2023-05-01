@@ -155,6 +155,7 @@ Stmt: Box<StmtEnum> = {
     t_Let <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::Declare(DeclareNode {<>})),
     <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::Assign(AssignNode {l: Box::new(AssignEnum::Var(l)), r: r})),
     <l: Property> "=" <r: Expr> ";" => Box::new(StmtEnum::Assign(AssignNode {l: Box::new(AssignEnum::Prop(l)), r: r})),
+    <func: Func> ";" => Box::new(StmtEnum::Func(<>)),
     t_While "(" <cond: Expr> ")" "{" <children: StmtList> "}" => Box::new(StmtEnum::While(WhileNode {<>})),
     <main: If> <alt: (t_Else <If>)*> <fin: Else> => Box::new(StmtEnum::Cond(CondNode {<>})),
 }
@@ -176,6 +177,10 @@ Else: Vec<Box<StmtEnum>> = {
 
 Property: PropertyNode = {
     <var:t_Id> "." <prop:t_Id> => PropertyNode {var: var, prop: prop},
+};
+
+Func: FuncNode = {
+    <name:t_Id> "(" <args:CommaList<Expr>> ")" => FuncNode {<>},
 };
 
 Expr: Box<ExprEnum> = {

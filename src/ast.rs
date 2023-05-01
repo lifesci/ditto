@@ -94,6 +94,12 @@ pub struct PropertyNode {
 }
 
 #[derive(Debug)]
+pub struct FuncNode {
+    pub name: String,
+    pub args: Vec<Box<ExprEnum>>,
+}
+
+#[derive(Debug)]
 pub struct WhileNode {
     pub cond: Box<ExprEnum>,
     pub children: Vec<Box<StmtEnum>>,
@@ -136,6 +142,7 @@ pub enum StmtEnum {
     Assign(AssignNode),
     Declare(DeclareNode),
     Cond(CondNode),
+    Func(FuncNode),
 }
 
 #[derive(Debug)]
