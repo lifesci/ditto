@@ -5,6 +5,9 @@ use std::fs;
 lalrpop_mod!(pub ditto);
 
 mod ast;
+// mod eval;
+// mod entity;
+// mod item;
 
 fn main() {
     match run_test() {
