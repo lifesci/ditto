@@ -5,7 +5,7 @@ use std::fs;
 lalrpop_mod!(pub ditto);
 
 mod ast;
-// mod eval;
+mod eval;
 // mod entity;
 // mod item;
 
