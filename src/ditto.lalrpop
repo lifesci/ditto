@@ -26,7 +26,7 @@ t_Lte: &'input str = "<=";
 t_Int: i32 = r"0|[1-9][0-9]*" => i32::from_str(<>).unwrap();
 
 // Identifiers
-t_Id: &'input str = r"[a-zA-Z][a-zA-Z0-9_]*" => <>;
+t_Id: String = r"[a-zA-Z][a-zA-Z0-9_]*" => <>.to_string();
 
 // Keywords
 t_Let: &'input str = "let";
@@ -63,7 +63,7 @@ CommaList<T>: Vec<T> = {
     },
 }
 
-pub Ditto: DittoNode<'input> = {
+pub Ditto: DittoNode = {
     <game: Game>
     <statblock: Statblock>
     <player: Player>
@@ -73,64 +73,64 @@ pub Ditto: DittoNode<'input> = {
     => DittoNode {<>},
 }
 
-Game: GameNode<'input> = {
+Game: GameNode = {
     "game" <name: t_Id> ";" => GameNode {name: name},
 }
 
-Statblock: StatblockNode<'input> = {
+Statblock: StatblockNode = {
     t_Statblock "{" <stats: StatList> "}" => StatblockNode {<>},
 }
 
-StatOverride: Vec<StatNode<'input>> = {
+StatOverride: Vec<StatNode> = {
     <stats: (t_Stats "{" <StatList> "}")?> => match stats {
         Some(s) => s,
         None => Vec::new(),
     },
 }
 
-StatList: Vec<StatNode<'input>> = {
+StatList: Vec<StatNode> = {
     <Stat*>,
 }
 
-Stat: StatNode<'input> = {
+Stat: StatNode = {
     <name: t_Id> "=" <val: Expr> ";" => StatNode {<>},
 }
 
-Player: EntityNode<'input> = {
+Player: EntityNode = {
     t_Player <name: t_Id> "{" <stats: StatOverride> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Player, <>},
 }
 
-Enemy: EntityNode<'input> = {
+Enemy: EntityNode = {
     t_Enemy <name: t_Id> "{" <stats: StatOverride> <actions: Action*> <triggers: Trigger*> "}" => EntityNode {entity: EntityType::Enemy, <>},
 }
 
-ItemTemplate: ItemTemplateNode<'input> = {
+ItemTemplate: ItemTemplateNode = {
     t_Item <name: t_Id> "<" <attribs: CommaList<t_Id>> ">" "(" <args: CommaList<t_Id>> ")" "{" <actions: Action*> "}" => ItemTemplateNode {<>},
 }
 
-ItemInstance: ItemInstanceNode<'input> = {
+ItemInstance: ItemInstanceNode = {
     <name: t_Id> "=" <template: t_Id> <attribs: ItemInstanceAttribList> "(" <args: CommaList<Expr>> ")" ";" => ItemInstanceNode {<>},
 }
 
-ItemInstanceAttribList: Vec<&'input str> = {
+ItemInstanceAttribList: Vec<String> = {
     <attribs: ("<" <CommaList<t_Id>> ">")?> => match attribs {
         Some(a) => a,
         None => Vec::new(),
     },
 }
 
-Door: DoorNode<'input> = {
+Door: DoorNode = {
     <name: t_Id> t_To <to:t_Id> <reqs: DoorReqs> ";" => DoorNode {<>},
 }
 
-DoorReqs: Vec<&'input str> = {
+DoorReqs: Vec<String> = {
     <reqs: (t_Requires "(" <CommaList<t_Id>> ")")?> => match reqs {
         Some(r) => r,
         None => Vec::new(),
     },
 }
 
-Room: RoomNode<'input> = {
+Room: RoomNode = {
     t_Room <name: t_Id> "{"
         t_Enemies "{" <enemies: EnemyInstance*> "}"
         t_Items  "{" <items: ItemInstance*> "}"
@@ -139,19 +139,19 @@ Room: RoomNode<'input> = {
     => RoomNode {<>},
 }
 
-EnemyInstance: EnemyInstanceNode<'input> = {
+EnemyInstance: EnemyInstanceNode = {
     <name: t_Id> "=" <enemy: t_Id> ";" => EnemyInstanceNode {<>},
 }
 
-Action: ActionNode<'input> = {
+Action: ActionNode = {
     t_Action <name: t_Id> t_Targets "(" <targets: Expr> ")" "{" <children: StmtList> "}" => ActionNode {<>},
 }
 
-Trigger: TriggerNode<'input> = {
+Trigger: TriggerNode = {
     t_Trigger <name: t_Id> t_On "(" <actions: Expr> ")" "{" <children: StmtList> "}" => TriggerNode {<>},
 }
 
-Stmt: Box<StmtEnum<'input>> = {
+Stmt: Box<StmtEnum> = {
     t_Let <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::Declare(DeclareNode {<>})),
     <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::Assign(AssignNode {l: Box::new(AssignEnum::Var(l)), r: r})),
     <l: Property> "=" <r: Expr> ";" => Box::new(StmtEnum::Assign(AssignNode {l: Box::new(AssignEnum::Prop(l)), r: r})),
@@ -160,30 +160,30 @@ Stmt: Box<StmtEnum<'input>> = {
     <main: If> <alt: (t_Else <If>)*> <fin: Else> => Box::new(StmtEnum::Cond(CondNode {<>})),
 }
 
-StmtList: Vec<Box<StmtEnum<'input>>> = {
+StmtList: Vec<Box<StmtEnum>> = {
     Stmt*,
 }
 
-If: IfNode<'input> = {
+If: IfNode = {
     t_If "(" <cond: Expr> ")" "{" <children: Stmt*> "}" => IfNode {<>},
 }
 
-Else: Vec<Box<StmtEnum<'input>>> = {
+Else: Vec<Box<StmtEnum>> = {
     <branch: (t_Else "{" <StmtList> "}")?> => match branch {
         None => Vec::new(),
         Some(b) => b,
     }
 };
 
-Property: PropertyNode<'input> = {
+Property: PropertyNode = {
     <var:t_Id> "." <prop:t_Id> => PropertyNode {var: var, prop: prop},
 };
 
-Func: FuncNode<'input> = {
+Func: FuncNode = {
     <name:t_Id> "(" <args:CommaList<Expr>> ")" => FuncNode {<>},
 };
 
-Expr: Box<ExprEnum<'input>> = {
+Expr: Box<ExprEnum> = {
     <l:Expr> t_Add <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Add, <>})),
     <l:Expr> t_Sub <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Sub, <>})),
     <l:Expr> t_Or <r:Factor> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Or, <>})),
@@ -195,7 +195,7 @@ Expr: Box<ExprEnum<'input>> = {
     Factor,
 }
 
-Factor: Box<ExprEnum<'input>> = {
+Factor: Box<ExprEnum> = {
     <l:Factor> t_Mul <r:Unary> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mul, <>})),
     <l:Factor> t_Div <r:Unary> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Div, <>})),
     <l:Factor> t_Mod <r:Unary> => Box::new(ExprEnum::BinOp(BinOpNode {op: BinOp::Mod, <>})),
@@ -203,13 +203,13 @@ Factor: Box<ExprEnum<'input>> = {
     <Unary>,
 }
 
-Unary: Box<ExprEnum<'input>> = {
+Unary: Box<ExprEnum> = {
     t_Sub <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Neg, <>})),
     t_Not <l:Term> => Box::new(ExprEnum::UnaryOp(UnaryOpNode {op:UnaryOp::Not, <>})),
     Term,
 }
 
-Term: Box<ExprEnum<'input>> = {
+Term: Box<ExprEnum> = {
     "(" <Expr> ")",
     t_Int => Box::new(ExprEnum::Int(<>)),
     t_Id => Box::new(ExprEnum::Var(<>)),

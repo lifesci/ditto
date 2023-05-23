@@ -1,170 +1,170 @@
 #[derive(Debug)]
-pub struct DittoNode<'a> {
-    pub game: GameNode<'a>,
-    pub statblock: StatblockNode<'a>,
-    pub player: EntityNode<'a>,
-    pub enemies: Vec<EntityNode<'a>>,
-    pub items: Vec<ItemTemplateNode<'a>>,
-    pub rooms: Vec<RoomNode<'a>>,
+pub struct DittoNode {
+    pub game: GameNode,
+    pub statblock: StatblockNode,
+    pub player: EntityNode,
+    pub enemies: Vec<EntityNode>,
+    pub items: Vec<ItemTemplateNode>,
+    pub rooms: Vec<RoomNode>,
 }
 
 #[derive(Debug)]
-pub struct GameNode<'a> {
-    pub name: &'a str,
+pub struct GameNode {
+    pub name: String,
 }
 
 #[derive(Debug)]
-pub struct StatblockNode<'a> {
-    pub stats: Vec<StatNode<'a>>,
+pub struct StatblockNode {
+    pub stats: Vec<StatNode>,
 }
 
 #[derive(Debug)]
-pub struct EntityNode<'a> {
+pub struct EntityNode {
     pub entity: EntityType,
-    pub name: &'a str,
-    pub stats: Vec<StatNode<'a>>,
-    pub actions: Vec<ActionNode<'a>>,
-    pub triggers: Vec<TriggerNode<'a>>,
+    pub name: String,
+    pub stats: Vec<StatNode>,
+    pub actions: Vec<ActionNode>,
+    pub triggers: Vec<TriggerNode>,
 }
 
 #[derive(Debug)]
 pub enum EntityType { Player, Enemy }
 
 #[derive(Debug)]
-pub struct StatNode<'a> {
-    pub name: &'a str,
-    pub val: Box<ExprEnum<'a>>,
+pub struct StatNode {
+    pub name: String,
+    pub val: Box<ExprEnum>,
 }
 
 #[derive(Debug)]
-pub struct ItemTemplateNode<'a> {
-    pub name: &'a str,
-    pub attribs: Vec<&'a str>,
-    pub args: Vec<&'a str>,
-    pub actions: Vec<ActionNode<'a>>,
+pub struct ItemTemplateNode {
+    pub name: String,
+    pub attribs: Vec<String>,
+    pub args: Vec<String>,
+    pub actions: Vec<ActionNode>,
 }
 
 #[derive(Debug)]
-pub struct ItemInstanceNode<'a> {
-    pub name: &'a str,
-    pub template: &'a str,
-    pub attribs: Vec<&'a str>,
-    pub args: Vec<Box<ExprEnum<'a>>>,
+pub struct ItemInstanceNode {
+    pub name: String,
+    pub template: String,
+    pub attribs: Vec<String>,
+    pub args: Vec<Box<ExprEnum>>,
 }
 
 #[derive(Debug)]
-pub struct DoorNode<'a> {
-    pub name: &'a str,
-    pub to: &'a str,
-    pub reqs: Vec<&'a str>,
+pub struct DoorNode {
+    pub name: String,
+    pub to: String,
+    pub reqs: Vec<String>,
 }
 
 #[derive(Debug)]
-pub struct EnemyInstanceNode<'a> {
-    pub name: &'a str,
-    pub enemy: &'a str,
+pub struct EnemyInstanceNode {
+    pub name: String,
+    pub enemy: String,
 }
 
 #[derive(Debug)]
-pub struct RoomNode<'a> {
-    pub name: &'a str,
-    pub enemies: Vec<EnemyInstanceNode<'a>>,
-    pub items: Vec<ItemInstanceNode<'a>>,
-    pub doors: Vec<DoorNode<'a>>,
+pub struct RoomNode {
+    pub name: String,
+    pub enemies: Vec<EnemyInstanceNode>,
+    pub items: Vec<ItemInstanceNode>,
+    pub doors: Vec<DoorNode>,
 }
 
 #[derive(Debug)]
-pub struct ActionNode<'a> {
-    pub name: &'a str,
-    pub targets: Box<ExprEnum<'a>>,
-    pub children: Vec<Box<StmtEnum<'a>>>,
+pub struct ActionNode {
+    pub name: String,
+    pub targets: Box<ExprEnum>,
+    pub children: Vec<Box<StmtEnum>>,
 }
 
 #[derive(Debug)]
-pub struct TriggerNode<'a> {
-    pub name: &'a str,
-    pub actions: Box<ExprEnum<'a>>,
-    pub children: Vec<Box<StmtEnum<'a>>>,
+pub struct TriggerNode {
+    pub name: String,
+    pub actions: Box<ExprEnum>,
+    pub children: Vec<Box<StmtEnum>>,
 }
 
 #[derive(Debug)]
-pub struct PropertyNode<'a> {
-    pub var: &'a str,
-    pub prop: &'a str,
+pub struct PropertyNode {
+    pub var: String,
+    pub prop: String,
 }
 
 #[derive(Debug)]
-pub struct FuncNode<'a> {
-    pub name: &'a str,
-    pub args: Vec<Box<ExprEnum<'a>>>,
+pub struct FuncNode {
+    pub name: String,
+    pub args: Vec<Box<ExprEnum>>,
 }
 
 #[derive(Debug)]
-pub struct WhileNode<'a> {
-    pub cond: Box<ExprEnum<'a>>,
-    pub children: Vec<Box<StmtEnum<'a>>>,
+pub struct WhileNode {
+    pub cond: Box<ExprEnum>,
+    pub children: Vec<Box<StmtEnum>>,
 }
 
 #[derive(Debug)]
-pub struct AssignNode<'a> {
-    pub l: Box<AssignEnum<'a>>,
-    pub r: Box<ExprEnum<'a>>,
+pub struct AssignNode {
+    pub l: Box<AssignEnum>,
+    pub r: Box<ExprEnum>,
 }
 
 #[derive(Debug)]
-pub struct DeclareNode<'a> {
-    pub l: &'a str,
-    pub r: Box<ExprEnum<'a>>,
+pub struct DeclareNode {
+    pub l: String,
+    pub r: Box<ExprEnum>,
 }
 
 #[derive(Debug)]
-pub struct IfNode<'a> {
-    pub cond: Box<ExprEnum<'a>>,
-    pub children: Vec<Box<StmtEnum<'a>>>,
+pub struct IfNode {
+    pub cond: Box<ExprEnum>,
+    pub children: Vec<Box<StmtEnum>>,
 }
 
 #[derive(Debug)]
-pub struct CondNode<'a> {
-    pub main: IfNode<'a>,
-    pub alt: Vec<IfNode<'a>>,
-    pub fin: Vec<Box<StmtEnum<'a>>>,
+pub struct CondNode {
+    pub main: IfNode,
+    pub alt: Vec<IfNode>,
+    pub fin: Vec<Box<StmtEnum>>,
 }
 
 #[derive(Debug)]
-pub enum AssignEnum<'a> {
-    Var(&'a str),
-    Prop(PropertyNode<'a>),
+pub enum AssignEnum {
+    Var(String),
+    Prop(PropertyNode),
 }
 
 #[derive(Debug)]
-pub enum StmtEnum<'a> {
-    While(WhileNode<'a>),
-    Assign(AssignNode<'a>),
-    Declare(DeclareNode<'a>),
-    Cond(CondNode<'a>),
-    Func(FuncNode<'a>),
+pub enum StmtEnum {
+    While(WhileNode),
+    Assign(AssignNode),
+    Declare(DeclareNode),
+    Cond(CondNode),
+    Func(FuncNode),
 }
 
 #[derive(Debug)]
-pub struct BinOpNode<'a> {
+pub struct BinOpNode {
     pub op: BinOp,
-    pub l: Box<ExprEnum<'a>>,
-    pub r: Box<ExprEnum<'a>>,
+    pub l: Box<ExprEnum>,
+    pub r: Box<ExprEnum>,
 }
 
 #[derive(Debug)]
-pub struct UnaryOpNode<'a> {
+pub struct UnaryOpNode {
     pub op: UnaryOp,
-    pub l: Box<ExprEnum<'a>>,
+    pub l: Box<ExprEnum>,
 }
 
 #[derive(Debug)]
-pub enum ExprEnum<'a> {
-    BinOp(BinOpNode<'a>),
-    UnaryOp(UnaryOpNode<'a>),
+pub enum ExprEnum {
+    BinOp(BinOpNode),
+    UnaryOp(UnaryOpNode),
     Int(i32),
-    Var(&'a str),
-    Prop(PropertyNode<'a>),
+    Var(String),
+    Prop(PropertyNode),
 }
 
 #[derive(Debug)]
