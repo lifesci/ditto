@@ -19,6 +19,10 @@ impl Scope {
             Some(x) => Some(*x),
         }
     }
+
+    fn add(&mut self, name: String, val: i32) {
+        self.vars.insert(name, val);
+    }
 }
 
 type Node = Option<Box<Scope>>;
@@ -34,6 +38,13 @@ impl Cactus {
             vars: HashMap::new(),
         };
         self.active = Some(Box::new(new_scope));
+    }
+
+    pub fn add(&mut self, name: String, val: i32) {
+        match self.active.as_mut() {
+            None => (),
+            Some(n) => n.add(name, val),
+        }
     }
 
     pub fn pop(&mut self) {
