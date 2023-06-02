@@ -5,12 +5,10 @@ use std::fs;
 lalrpop_mod!(pub ditto);
 
 mod ast;
-// mod eval;
 mod scope;
+mod eval;
 // mod entity;
 // mod item;
-
-use crate::scope::Cactus;
 
 fn main() {
     match run_test() {
@@ -20,9 +18,6 @@ fn main() {
         },
         Err(_e) => (),
     }
-    let scope = Cactus::new();
-    // scope.add("Test".to_string(), 2);
-    // scope.lookup("Test".to_string());
 }
 
 #[test]

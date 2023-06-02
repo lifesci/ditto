@@ -106,8 +106,14 @@ pub struct WhileNode {
 }
 
 #[derive(Debug)]
-pub struct AssignNode {
-    pub l: Box<AssignEnum>,
+pub struct AssignVarNode {
+    pub l: String,
+    pub r: Box<ExprEnum>,
+}
+
+#[derive(Debug)]
+pub struct AssignPropNode {
+    pub l: PropertyNode,
     pub r: Box<ExprEnum>,
 }
 
@@ -131,15 +137,10 @@ pub struct CondNode {
 }
 
 #[derive(Debug)]
-pub enum AssignEnum {
-    Var(String),
-    Prop(PropertyNode),
-}
-
-#[derive(Debug)]
 pub enum StmtEnum {
     While(WhileNode),
-    Assign(AssignNode),
+    AssignVar(AssignVarNode),
+    AssignProp(AssignPropNode),
     Declare(DeclareNode),
     Cond(CondNode),
     Func(FuncNode),

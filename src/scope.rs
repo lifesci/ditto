@@ -10,8 +10,8 @@ struct Scope {
 }
 
 impl Scope {
-    fn lookup(&self, name: String) -> Option<i32> {
-        match self.vars.get(&name) {
+    fn lookup(&self, name: &String) -> Option<i32> {
+        match self.vars.get(name) {
             None => match self.parent.as_ref() {
                 None => None,
                 Some(n) => n.lookup(name),
@@ -22,6 +22,17 @@ impl Scope {
 
     fn add(&mut self, name: String, val: i32) {
         self.vars.insert(name, val);
+    }
+
+    fn update(&mut self, name: String, val: i32) {
+        if self.vars.contains_key(&name) {
+            self.vars.insert(name, val);
+        } else {
+            match self.parent.as_mut() {
+                None => panic!("Cannot update undeclared variable {name}", name=name),
+                Some(x) => x.update(name, val),
+            }
+        }
     }
 }
 
@@ -47,6 +58,13 @@ impl Cactus {
         }
     }
 
+    pub fn update(&mut self, name: String, val: i32) {
+        match self.active.as_mut() {
+            None => panic!("Cannot update undeclared variable {name}", name=name),
+            Some(n) => n.update(name, val),
+        }
+    }
+
     pub fn pop(&mut self) {
         self.active = match self.active.take() {
             None => None,
@@ -54,7 +72,7 @@ impl Cactus {
         }
     }
 
-    pub fn lookup(&self, name: String) -> Option<i32> { 
+    pub fn lookup(&self, name: &String) -> Option<i32> {
         match self.active.as_ref() {
             None => None,
             Some(n) => n.lookup(name),

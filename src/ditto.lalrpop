@@ -153,8 +153,8 @@ Trigger: TriggerNode = {
 
 Stmt: Box<StmtEnum> = {
     t_Let <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::Declare(DeclareNode {<>})),
-    <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::Assign(AssignNode {l: Box::new(AssignEnum::Var(l)), r: r})),
-    <l: Property> "=" <r: Expr> ";" => Box::new(StmtEnum::Assign(AssignNode {l: Box::new(AssignEnum::Prop(l)), r: r})),
+    <l: t_Id> "=" <r: Expr> ";" => Box::new(StmtEnum::AssignVar(AssignVarNode {l: l, r: r})),
+    <l: Property> "=" <r: Expr> ";" => Box::new(StmtEnum::AssignProp(AssignPropNode {l: l, r: r})),
     <func: Func> ";" => Box::new(StmtEnum::Func(<>)),
     t_While "(" <cond: Expr> ")" "{" <children: StmtList> "}" => Box::new(StmtEnum::While(WhileNode {<>})),
     <main: If> <alt: (t_Else <If>)*> <fin: Else> => Box::new(StmtEnum::Cond(CondNode {<>})),
