@@ -1,8 +1,18 @@
 use crate::ast::*;
 use crate::scope::Cactus;
+use std::collections::HashMap;
 
 pub fn eval(node: &DittoNode) {
 
+}
+
+fn eval_statblock(node: &StatblockNode) -> HashMap<String, i32> {
+    let scope = Cactus::new();
+    let mut stats = HashMap::new();
+    for stat_node in &node.stats {
+        stats.insert(stat_node.name.to_string(), eval_expr(&stat_node.val, &scope));
+    }
+    stats
 }
 
 fn eval_stmt(stmt: &StmtEnum, scope: &mut Cactus) {
