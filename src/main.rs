@@ -8,13 +8,16 @@ mod ast;
 mod scope;
 mod eval;
 // mod entity;
-// mod item;
+mod item;
+
+use crate::eval::eval;
 
 fn main() {
     match run_test() {
         Ok(s) => {
             let val = ditto::DittoParser::new().parse(&s).unwrap();
             println!("{:?}", val);
+            eval(&val);
         },
         Err(_e) => (),
     }

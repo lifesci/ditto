@@ -1,9 +1,16 @@
 use crate::ast::*;
 use crate::scope::Cactus;
+use crate::item::Item;
 use std::collections::HashMap;
+use rand::Rng;
 
 pub fn eval(node: &DittoNode) {
-
+    let name = &node.game.name;
+    let statblock = eval_statblock(&node.statblock);
+    // &node.player;
+    // &node.enemies;
+    let item_templates = eval_item_templates(&node.items);
+    // &node.rooms;
 }
 
 fn eval_statblock(node: &StatblockNode) -> HashMap<String, i32> {
@@ -13,6 +20,18 @@ fn eval_statblock(node: &StatblockNode) -> HashMap<String, i32> {
         stats.insert(stat_node.name.to_string(), eval_expr(&stat_node.val, &scope));
     }
     stats
+}
+
+fn eval_item_templates(nodes: &Vec<ItemTemplateNode>) -> HashMap<String, &ItemTemplateNode> {
+    let mut templates = HashMap::new();
+    for node in nodes {
+        templates.insert(node.name.to_string(), node);
+    }
+    templates
+}
+
+fn eval_item_instance(node: &ItemInstanceNode, templates: &HashMap<String, &ItemTemplateNode>) -> Item {
+    Item::new(node, templates)
 }
 
 fn eval_stmt(stmt: &StmtEnum, scope: &mut Cactus) {
@@ -45,7 +64,7 @@ fn eval_cond(node: &CondNode, scope: &mut Cactus) {
     if !eval_if(&node.main, scope) {
         let mut entered_alt = false;
         for alt in &node.alt {
-            if (eval_if(&alt, scope)) {
+            if eval_if(&alt, scope) {
                 entered_alt = true;
                 break;
             }
@@ -84,6 +103,7 @@ fn eval_expr(expr: &ExprEnum, scope: &Cactus) -> i32 {
 
         // TODO: Replace with property lookup
         ExprEnum::Prop(node) => 0,
+        ExprEnum::Dice(node) => eval_dice(node),
         _ => 0,
     }
 }
@@ -114,4 +134,9 @@ fn eval_unary_op(node: &UnaryOpNode, scope: &Cactus) -> i32 {
         UnaryOp::Neg => -eval_expr(&*node.l, scope),
         UnaryOp::Not => (!itob(eval_expr(&*node.l, scope))) as i32,
     }
+}
+
+fn eval_dice(node: &DiceNode) -> i32 {
+    let mut rng = rand::thread_rng();
+    (0..node.num).map(|_| rng.gen_range(1..=node.faces)).fold(0, |acc, x| acc + x)
 }

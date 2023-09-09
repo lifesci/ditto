@@ -166,6 +166,7 @@ pub enum ExprEnum {
     Int(i32),
     Var(String),
     Prop(PropertyNode),
+    Dice(DiceNode),
 }
 
 #[derive(Debug)]
@@ -188,4 +189,10 @@ pub enum BinOp {
 pub enum UnaryOp {
     Neg,
     Not,
+}
+
+#[derive(Debug)]
+pub struct DiceNode {
+    pub num: i32,
+    pub faces: i32,
 }
